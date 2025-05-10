@@ -1,16 +1,22 @@
-# afinz_app
+# Afinz Technical Challenge (Flutter)
 
-A new Flutter project.
+This project is a solution for the Afinz technical challenge. It uses **Flutter**, **Clean Architecture**, **BLoC**, and **Dependency Injection** via `get_it`.
+
+## Project Structure
+
+- `core/`: Common error handling, dependency injection, and shared logic
+- `features/`: Organized by modules (balance, transfer, profile), following clean layers (data, domain, presentation)
+- `shared/`: Reusable widgets and theme configuration
+
+## 🔐 Environment Variables
+
+This app uses `dart-define` to inject environment variables:
+
+```bash
+flutter run --dart-define=API_TOKEN=TOKEN-TEST-AFINZ
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter pub get
+flutter run
