@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/injection.dart' as di;
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  di.init();
-  runApp(const MyApp());
+  await dotenv.load(fileName: ".env");
+  await di.init();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -12,22 +14,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: di.getIt.allReady(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return MaterialApp(
-            title: 'Afinz Challenge',
-            theme: ThemeData(primarySwatch: Colors.indigo),
-            home: const Placeholder(),
-          );
-        }
-        return const Material(
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-      },
+    return MaterialApp(
+      title: 'Afinz Challenge',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: Scaffold(
+        appBar: AppBar(title: Text('Afinz App')),
+        body: Center(child: Text('Hello Afinz')),
+      ),
     );
   }
 }
