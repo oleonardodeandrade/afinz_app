@@ -1,0 +1,31 @@
+import 'package:dio/dio.dart';
+
+abstract class TransferRemoteDatasource {
+  Future<void> transfer({
+    required int value,
+    required int agency,
+    required int account,
+  });
+}
+
+class TransferRemoteDatasourceImpl implements TransferRemoteDatasource {
+  final Dio dio;
+
+  TransferRemoteDatasourceImpl(this.dio);
+
+  @override
+  Future<void> transfer({
+    required int value,
+    required int agency,
+    required int account,
+  }) async {
+    final response = await dio.post(
+      '/transfer',
+      data: {'value': value, 'agency': agency, 'account': account},
+    );
+
+    if (response.statusCode! >= 400) {
+      throw Exception(response.data['message'] ?? 'Falha ao transferir');
+    }
+  }
+}
