@@ -1,7 +1,5 @@
-import 'package:afinz_app/core/error/app_error.dart';
 import 'package:afinz_app/features/transfer/domain/repositories/transfer_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dio/dio.dart';
 import 'transfer_event.dart';
 import 'transfer_state.dart';
 
@@ -9,45 +7,93 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
   final TransferRepository repository;
   final int currentBalance;
 
-  TransferBloc({required this.repository, required this.currentBalance})
-    : super(TransferState.initial()) {
-    on<AgencyChanged>(
-      (e, emit) => emit(state.copyWith(agency: e.value, error: null)),
-    );
-    on<AccountChanged>(
-      (e, emit) => emit(state.copyWith(account: e.value, error: null)),
-    );
-    on<AmountChanged>(
-      (e, emit) => emit(state.copyWith(amount: e.value, error: null)),
-    );
+  TransferBloc({
+    required this.repository,
+    required this.currentBalance,
+  }) : super(TransferState()) {
+    on<AgencyChanged>((event, emit) {
+      emit(state.copyWith(
+        agency: event.value,
+        error: null,
+      ));
+    });
+
+    on<AccountChanged>((event, emit) {
+      emit(state.copyWith(
+        account: event.value,
+        error: null,
+      ));
+    });
+
+    on<AmountChanged>((event, emit) {
+      emit(state.copyWith(
+        amount: event.value,
+        error: null,
+      ));
+    });
+
+    on<ValidateAgencyAccount>((event, emit) async {
+      if (event.agency.isEmpty || event.account.isEmpty) return;
+
+      try {
+        emit(state.copyWith(isSubmitting: true, error: null));
+        final recipientName = await repository.validateAgencyAccount(
+          agency: int.parse(event.agency),
+          account: int.parse(event.account),
+        );
+        emit(state.copyWith(
+          isSubmitting: false,
+          recipientName: recipientName,
+          isValid: true,
+        ));
+      } catch (e) {
+        emit(state.copyWith(
+          isSubmitting: false,
+          error: e.toString(),
+          isValid: false,
+        ));
+      }
+    });
 
     on<SubmitTransfer>((event, emit) async {
-      if (!state.isValid) {
-        emit(state.copyWith(error: 'Preencha todos os campos corretamente'));
+      if (!state.isFormValid) return;
+
+      final amount = int.tryParse(state.amount);
+      if (amount == null || amount <= 0) {
+        emit(state.copyWith(error: 'Valor inválido'));
         return;
       }
 
-      final amountInCents = int.parse(state.amount);
-      if (amountInCents > currentBalance) {
+      if (amount > currentBalance) {
         emit(state.copyWith(error: 'Saldo insuficiente'));
         return;
       }
 
-      emit(state.copyWith(isSubmitting: true, error: null));
-
       try {
-        await repository.transfer(
+        emit(state.copyWith(isSubmitting: true, error: null));
+
+        final recipientName = await repository.validateAgencyAccount(
           agency: int.parse(state.agency),
           account: int.parse(state.account),
-          value: amountInCents,
         );
-        emit(state.copyWith(isSubmitting: false, isSuccess: true));
-      } on DioException catch (e) {
-        final error = AppError.fromDioError(e);
-        emit(state.copyWith(isSubmitting: false, error: error.message));
+
+        await repository.transfer(
+          value: amount,
+          agency: int.parse(state.agency),
+          account: int.parse(state.account),
+        );
+
+        emit(state.copyWith(
+          isSubmitting: false,
+          recipientName: recipientName,
+          isValid: true,
+        ));
       } catch (e) {
-        final error = AppError.unknown(e);
-        emit(state.copyWith(isSubmitting: false, error: error.message));
+        emit(state.copyWith(
+          isSubmitting: false,
+          error: e.toString(),
+          isValid: false,
+        ));
       }
     });
   }

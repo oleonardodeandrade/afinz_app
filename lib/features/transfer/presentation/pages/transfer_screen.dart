@@ -34,19 +34,19 @@ class TransferScreen extends StatelessWidget {
       ),
       child: BlocConsumer<TransferBloc, TransferState>(
         listener: (context, state) {
-          if (state.isSuccess) {
+          if (state.isValid) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder:
-                    (_) => TransferConfirmationPage(
-                      toAgency: state.agency,
-                      toAccount: state.account,
-                      amountInCents: int.tryParse(state.amount) ?? 0,
-                      currentBalanceInCents: homeState.balance,
-                      fromAgency: homeState.profile.agency.toString(),
-                      fromAccount: homeState.profile.account.toString(),
-                    ),
+                builder: (_) => TransferConfirmationPage(
+                  toAgency: state.agency,
+                  toAccount: state.account,
+                  amountInCents: int.tryParse(state.amount) ?? 0,
+                  currentBalanceInCents: homeState.balance,
+                  fromAgency: homeState.profile.agency.toString(),
+                  fromAccount: homeState.profile.account.toString(),
+                  recipientName: state.recipientName,
+                ),
               ),
             );
           }

@@ -13,6 +13,7 @@ class TransferConfirmationPage extends StatelessWidget {
   final int currentBalanceInCents;
   final String fromAgency;
   final String fromAccount;
+  final String? recipientName;
 
   const TransferConfirmationPage({
     super.key,
@@ -22,6 +23,7 @@ class TransferConfirmationPage extends StatelessWidget {
     required this.currentBalanceInCents,
     required this.fromAgency,
     required this.fromAccount,
+    this.recipientName,
   });
 
   @override
@@ -71,9 +73,9 @@ class TransferConfirmationPage extends StatelessWidget {
               hideEye: false,
             ),
             const SizedBox(height: 32),
-            const CustomTitleWithSubtitleWidget(
+            CustomTitleWithSubtitleWidget(
               title: 'Transferir para',
-              subtitle: 'Leonardo',
+              subtitle: recipientName ?? '',
             ),
             CustomTitleWithSubtitleWidget(
               title: 'Agência',
