@@ -27,5 +27,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ));
       }
     });
+
+    on<UpdateBalance>((event, emit) {
+      if (state is HomeLoaded) {
+        final currentState = state as HomeLoaded;
+        emit(currentState.copyWith(
+          balance: event.newBalance,
+        ));
+      }
+    });
   }
 }

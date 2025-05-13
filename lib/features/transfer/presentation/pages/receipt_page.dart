@@ -1,10 +1,13 @@
 import 'package:afinz_app/shared/widgets/dividers/divider_widget.dart';
 import 'package:afinz_app/shared/widgets/text/text_and_subtitle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../shared/widgets/buttons/custom_button_widget.dart';
 import '../../../../shared/widgets/data/custom_eye_value.dart';
 import '../../../../shared/widgets/layout/custom_header_widget.dart';
+import '../../../app/presentation/bloc/home_bloc.dart';
+import '../../../app/presentation/bloc/home_event.dart';
 import '../../../app/presentation/pages/home_screen.dart';
 
 class ReceiptPage extends StatelessWidget {
@@ -44,6 +47,7 @@ class ReceiptPage extends StatelessWidget {
         title: 'Voltar para home ',
         color: Colors.green,
         onTap: () {
+          context.read<HomeBloc>().add(UpdateBalance(finalBalanceInCents));
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => const HomeScreen()),
             (route) => false,
