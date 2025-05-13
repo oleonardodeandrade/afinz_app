@@ -1,8 +1,8 @@
+import 'package:afinz_app/features/app/presentation/pages/balance/domain/repositories/balance_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'home_event.dart';
 import 'home_state.dart';
 import '../../../profile/domain/repositories/profile_repository.dart';
-import '../../../balance/domain/repositories/balance_repository.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final ProfileRepository profileRepository;

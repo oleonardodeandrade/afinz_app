@@ -1,14 +1,20 @@
-import 'package:afinz_app/features/transfer/data/repositories/transfer_repository_impl.dart';
+// IMPORTS
+import 'package:afinz_app/features/profile/presentation/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dio/dio.dart';
 
+import '../../../app/presentation/bloc/home_bloc.dart';
+import '../../../app/presentation/bloc/home_state.dart';
 import '../../data/datasources/transfer_remote_datasource.dart';
+import '../../data/repositories/transfer_repository_impl.dart';
 import '../bloc/transfer_bloc.dart';
 import '../bloc/transfer_event.dart';
 import '../bloc/transfer_state.dart';
-import '../../../app/presentation/bloc/home_bloc.dart';
-import '../../../app/presentation/bloc/home_state.dart';
+
+import '../../../../shared/widgets/inputs/input_widget.dart';
+import '../../../../shared/widgets/layout/custom_header_widget.dart';
+import '../../../../shared/widgets/buttons/custom_button_widget.dart';
 
 class TransferScreen extends StatelessWidget {
   const TransferScreen({super.key});
@@ -22,52 +28,84 @@ class TransferScreen extends StatelessWidget {
     }
 
     return BlocProvider(
-      create: (_) => TransferBloc(
-        repository: TransferRepositoryImpl(TransferRemoteDatasourceImpl(Dio())),
-        currentBalance: homeState.balance,
-      ),
-      child: Scaffold(
-        appBar: AppBar(title: const Text('Transferir')),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: BlocConsumer<TransferBloc, TransferState>(
-            listener: (context, state) {
-              if (state.isSuccess) {
-                Navigator.pop(context);
-              }
-            },
-            builder: (context, state) {
-              return Column(
-                children: [
-                  TextField(
-                    decoration: const InputDecoration(labelText: 'Agencia'),
-                    onChanged: (v) => context.read<TransferBloc>().add(AgencyChanged(v)),
-                  ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: 'Conta'),
-                    onChanged: (v) => context.read<TransferBloc>().add(AccountChanged(v)),
-                  ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: 'Saldo'),
-                    keyboardType: TextInputType.number,
-                    onChanged: (v) => context.read<TransferBloc>().add(AmountChanged(v)),
-                  ),
-                  const SizedBox(height: 20),
-                  if (state.error != null)
-                    Text(state.error!, style: const TextStyle(color: Colors.red)),
-                  ElevatedButton(
-                    onPressed: state.isValid && !state.isSubmitting
-                        ? () => context.read<TransferBloc>().add(SubmitTransfer())
-                        : null,
-                    child: state.isSubmitting
-                        ? const CircularProgressIndicator()
-                        : const Text('Transferir'),
-                  ),
-                ],
-              );
-            },
+      create:
+          (_) => TransferBloc(
+            repository: TransferRepositoryImpl(
+              TransferRemoteDatasourceImpl(Dio()),
+            ),
+            currentBalance: homeState.balance,
           ),
-        ),
+      child: BlocConsumer<TransferBloc, TransferState>(
+        listener: (context, state) {
+          if (state.isSuccess) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (_) => TransferConfirmationPage(
+                      toAgency: state.agency,
+                      toAccount: state.account,
+                      amountInCents: int.tryParse(state.amount) ?? 0,
+                      currentBalanceInCents: homeState.balance,
+                      fromAgency: homeState.profile.agency.toString(),
+                      fromAccount: homeState.profile.account.toString(),
+                    ),
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          return CustomHeaderWidget.expanded(
+            appBarTitle: 'Transferir',
+            isLeadingIcon: true,
+            onTapLeadingIcon: () => Navigator.pop(context),
+            bottomNavigationWidget: CustomButtonWidget(
+              title: state.isSubmitting ? 'Enviando...' : 'Continuar',
+              isLoading: state.isSubmitting,
+              onTap:
+                  state.isValid && !state.isSubmitting
+                      ? () {
+                        context.read<TransferBloc>().add(SubmitTransfer());
+                      }
+                      : null,
+            ),
+            body: SafeArea(
+              minimum: const EdgeInsets.only(top: 32, left: 24, right: 24),
+              child: Column(
+                children: [
+                  InputWidget(
+                    hintText: 'Agência',
+                    onChanged:
+                        (v) =>
+                            context.read<TransferBloc>().add(AgencyChanged(v)),
+                  ),
+                  const SizedBox(height: 12),
+                  InputWidget(
+                    hintText: 'Conta',
+                    onChanged:
+                        (v) =>
+                            context.read<TransferBloc>().add(AccountChanged(v)),
+                  ),
+                  const SizedBox(height: 12),
+                  InputWidget(
+                    hintText: 'Valor',
+                    keyboardType: TextInputType.number,
+                    onChanged:
+                        (v) =>
+                            context.read<TransferBloc>().add(AmountChanged(v)),
+                  ),
+                  if (state.error != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      state.error!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
