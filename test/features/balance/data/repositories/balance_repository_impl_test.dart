@@ -3,7 +3,7 @@ import 'package:mockito/mockito.dart';
 
 import 'package:afinz_app/features/balance/data/repositories/balance_repository_impl.dart';
 
-import '../../../transfer/mocks/mock_balance_remote_datasource.mocks.dart';
+import '../../mocks/mock_balance_remote_datasource.mocks.dart';
 
 void main() {
   late BalanceRepositoryImpl repository;
