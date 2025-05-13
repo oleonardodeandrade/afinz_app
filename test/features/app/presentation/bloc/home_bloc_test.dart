@@ -7,7 +7,7 @@ import 'package:afinz_app/features/app/presentation/bloc/home_event.dart';
 import 'package:afinz_app/features/app/presentation/bloc/home_state.dart';
 import 'package:afinz_app/features/profile/domain/entities/profile.dart';
 
-import '../../../transfer/mocks/mock_home_dependencies.mocks.dart';
+import '../../mocks/mock_home_dependencies.mocks.dart';
 
 void main() {
   late MockProfileRepository profileRepository;
