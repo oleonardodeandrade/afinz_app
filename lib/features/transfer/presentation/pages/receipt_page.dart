@@ -31,7 +31,7 @@ class ReceiptPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final balanceFormatted = (finalBalanceInCents / 100).toStringAsFixed(2).split(',');
+    final balanceFormatted = (finalBalanceInCents / 100).toStringAsFixed(2).split('.');
     final amountFormatted = (amountInCents / 100).toStringAsFixed(2);
     final dateStr = "${dateTime.day}/${dateTime.month}/${dateTime.year}";
     final timeStr = "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";

@@ -28,13 +28,10 @@ class TransferScreen extends StatelessWidget {
     }
 
     return BlocProvider(
-      create:
-          (_) => TransferBloc(
-            repository: TransferRepositoryImpl(
-              TransferRemoteDatasourceImpl(Dio()),
-            ),
-            currentBalance: homeState.balance,
-          ),
+      create: (_) => TransferBloc(
+        repository: TransferRepositoryImpl(TransferRemoteDatasourceImpl()),
+        currentBalance: homeState.balance,
+      ),
       child: BlocConsumer<TransferBloc, TransferState>(
         listener: (context, state) {
           if (state.isSuccess) {

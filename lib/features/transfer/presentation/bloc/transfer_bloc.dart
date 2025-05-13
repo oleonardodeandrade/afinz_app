@@ -1,5 +1,7 @@
+import 'package:afinz_app/core/error/app_error.dart';
 import 'package:afinz_app/features/transfer/domain/repositories/transfer_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dio/dio.dart';
 import 'transfer_event.dart';
 import 'transfer_state.dart';
 
@@ -40,8 +42,12 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
           value: amountInCents,
         );
         emit(state.copyWith(isSubmitting: false, isSuccess: true));
+      } on DioException catch (e) {
+        final error = AppError.fromDioError(e);
+        emit(state.copyWith(isSubmitting: false, error: error.message));
       } catch (e) {
-        emit(state.copyWith(isSubmitting: false, error: e.toString()));
+        final error = AppError.unknown(e);
+        emit(state.copyWith(isSubmitting: false, error: error.message));
       }
     });
   }
