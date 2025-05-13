@@ -18,5 +18,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         emit(HomeError('Erro ao carregar dados'));
       }
     });
+
+    on<ToggleBalanceVisibility>((event, emit) {
+      if (state is HomeLoaded) {
+        final currentState = state as HomeLoaded;
+        emit(currentState.copyWith(
+          isBalanceVisible: !currentState.isBalanceVisible,
+        ));
+      }
+    });
   }
 }
