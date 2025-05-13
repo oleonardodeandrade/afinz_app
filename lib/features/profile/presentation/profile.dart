@@ -27,9 +27,9 @@ class TransferConfirmationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formattedValue = (amountInCents / 100).toStringAsFixed(2);
-    final parts = formattedValue.split(',');
+    final parts = formattedValue.split('.');
     final main = parts[0];
-    final cents = parts.length > 1 ? parts[1] : '00';
+    final cents = parts[1];
 
     final newBalance = currentBalanceInCents - amountInCents;
 

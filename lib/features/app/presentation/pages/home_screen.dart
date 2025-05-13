@@ -29,9 +29,9 @@ class HomeScreen extends StatelessWidget {
         if (state is HomeLoaded) {
           final name = state.profile.name;
           final balance = (state.balance / 100).toStringAsFixed(2);
-          final parts = balance.split(',');
+          final parts = balance.split('.');
           final main = parts[0];
-          final cents = parts.length > 1 ? parts[1] : '00';
+          final cents = parts[1];
 
           return CustomHeaderWidget(
             bottomNavigationWidget: CustomButtonWidget(
