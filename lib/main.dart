@@ -1,4 +1,4 @@
-import 'package:afinz_app/features/transfer/presentation/pages/transfer_screen_placeholder.dart';
+import 'package:afinz_app/features/transfer/presentation/pages/transfer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         initialRoute: '/',
         routes: {
           '/': (_) => const HomeScreen(),
-          '/transfer': (_) => const TransferScreenPlaceholder(),
+          '/transfer': (_) => const TransferScreen(),
         },
       ),
     );
