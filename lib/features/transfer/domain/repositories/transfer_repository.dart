@@ -4,4 +4,9 @@ abstract class TransferRepository {
     required int agency,
     required int account,
   });
+
+  Future<String> validateAgencyAccount({
+    required int agency,
+    required int account,
+  });
 }

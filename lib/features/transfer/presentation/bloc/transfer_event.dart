@@ -15,4 +15,11 @@ class AmountChanged extends TransferEvent {
   AmountChanged(this.value);
 }
 
+class ValidateAgencyAccount extends TransferEvent {
+  final String agency;
+  final String account;
+
+  ValidateAgencyAccount(this.agency, this.account);
+}
+
 class SubmitTransfer extends TransferEvent {}

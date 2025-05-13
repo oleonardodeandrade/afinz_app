@@ -7,6 +7,11 @@ abstract class TransferRemoteDatasource {
     required int agency,
     required int account,
   });
+
+  Future<String> validateAgencyAccount({
+    required int agency,
+    required int account,
+  });
 }
 
 class TransferRemoteDatasourceImpl implements TransferRemoteDatasource {
@@ -31,6 +36,26 @@ class TransferRemoteDatasourceImpl implements TransferRemoteDatasource {
       }
     } on DioException catch (e) {
       throw Exception(e.response?.data['message'] ?? 'Falha ao transferir');
+    }
+  }
+
+  @override
+  Future<String> validateAgencyAccount({
+    required int agency,
+    required int account,
+  }) async {
+    try {
+      final response = await dio.get(
+        '/consult-agency-account/$agency/$account',
+      );
+
+      if (response.statusCode! >= 400) {
+        throw Exception(response.data['message'] ?? 'Agência/conta inválida');
+      }
+
+      return response.data['name'] as String;
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Agência/conta inválida');
     }
   }
 }

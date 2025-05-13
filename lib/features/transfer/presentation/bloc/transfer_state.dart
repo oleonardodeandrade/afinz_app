@@ -2,49 +2,40 @@ class TransferState {
   final String agency;
   final String account;
   final String amount;
-  final bool isSubmitting;
-  final bool isSuccess;
   final String? error;
+  final bool isSubmitting;
+  final bool isValid;
+  final String? recipientName;
 
-  bool get isValid =>
-      agency.length == 4 &&
-      account.length == 4 &&
-      int.tryParse(amount) != null &&
-      int.parse(amount) > 0;
-
-  const TransferState({
-    required this.agency,
-    required this.account,
-    required this.amount,
-    required this.isSubmitting,
-    required this.isSuccess,
+  TransferState({
+    this.agency = '',
+    this.account = '',
+    this.amount = '',
     this.error,
+    this.isSubmitting = false,
+    this.isValid = false,
+    this.recipientName,
   });
 
-  factory TransferState.initial() => const TransferState(
-    agency: '',
-    account: '',
-    amount: '',
-    isSubmitting: false,
-    isSuccess: false,
-    error: null,
-  );
+  bool get isFormValid => agency.isNotEmpty && account.isNotEmpty && amount.isNotEmpty;
 
   TransferState copyWith({
     String? agency,
     String? account,
     String? amount,
-    bool? isSubmitting,
-    bool? isSuccess,
     String? error,
+    bool? isSubmitting,
+    bool? isValid,
+    String? recipientName,
   }) {
     return TransferState(
       agency: agency ?? this.agency,
       account: account ?? this.account,
       amount: amount ?? this.amount,
-      isSubmitting: isSubmitting ?? this.isSubmitting,
-      isSuccess: isSuccess ?? this.isSuccess,
       error: error,
+      isSubmitting: isSubmitting ?? this.isSubmitting,
+      isValid: isValid ?? this.isValid,
+      recipientName: recipientName ?? this.recipientName,
     );
   }
 }
