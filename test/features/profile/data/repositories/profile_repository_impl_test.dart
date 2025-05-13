@@ -4,7 +4,7 @@ import 'package:mockito/mockito.dart';
 import 'package:afinz_app/features/profile/data/repositories/profile_repository_impl.dart';
 import 'package:afinz_app/features/profile/domain/entities/profile.dart';
 
-import '../../../transfer/mocks/mock_profile_remote_datasource.mocks.dart';
+import '../../mocks/mock_profile_remote_datasource.mocks.dart';
 
 void main() {
   late ProfileRepositoryImpl repository;
