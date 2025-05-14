@@ -1,8 +1,7 @@
-// IMPORTS
 import 'package:afinz_app/features/profile/presentation/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
 
 import '../../../app/presentation/bloc/home_bloc.dart';
 import '../../../app/presentation/bloc/home_state.dart';
@@ -22,6 +21,7 @@ class TransferScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homeState = context.read<HomeBloc>().state;
+    final amountController = TextEditingController();
 
     if (homeState is! HomeLoaded) {
       return const Scaffold(body: Center(child: Text('Saldo não carregado')));
@@ -85,11 +85,26 @@ class TransferScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   InputWidget(
+                    controller: amountController,
                     hintText: 'Valor',
                     keyboardType: TextInputType.number,
-                    onChanged:
-                        (v) =>
-                            context.read<TransferBloc>().add(AmountChanged(v)),
+                    onChanged: (v) {
+                      if (v.isEmpty) {
+                        context.read<TransferBloc>().add(AmountChanged(''));
+                        return;
+                      }
+                      final numericValue = v.replaceAll(RegExp(r'[^0-9]'), '');
+                      final amount = int.tryParse(numericValue) ?? 0;
+                      final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$', decimalDigits: 2);
+                      final formattedValue = formatter.format(amount / 100);
+                      
+                      amountController.value = TextEditingValue(
+                        text: formattedValue,
+                        selection: TextSelection.collapsed(offset: formattedValue.length),
+                      );
+                      
+                      context.read<TransferBloc>().add(AmountChanged(numericValue));
+                    },
                   ),
                   if (state.error != null) ...[
                     const SizedBox(height: 12),

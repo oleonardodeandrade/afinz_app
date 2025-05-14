@@ -4,12 +4,14 @@ class InputWidget extends StatelessWidget {
   final String hintText;
   final void Function(String)? onChanged;
   final TextInputType keyboardType;
+  final TextEditingController? controller;
 
   const InputWidget({
     super.key,
     required this.hintText,
     this.onChanged,
     this.keyboardType = TextInputType.number,
+    this.controller,
   });
 
   @override
@@ -24,6 +26,7 @@ class InputWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: TextField(
+        controller: controller,
         keyboardType: keyboardType,
         onChanged: onChanged,
         decoration: InputDecoration(
