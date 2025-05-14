@@ -34,22 +34,7 @@ class TransferScreen extends StatelessWidget {
       ),
       child: BlocConsumer<TransferBloc, TransferState>(
         listener: (context, state) {
-          if (state.isValid) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => TransferConfirmationPage(
-                  toAgency: state.agency,
-                  toAccount: state.account,
-                  amountInCents: int.tryParse(state.amount) ?? 0,
-                  currentBalanceInCents: homeState.balance,
-                  fromAgency: homeState.profile.agency.toString(),
-                  fromAccount: homeState.profile.account.toString(),
-                  recipientName: state.recipientName,
-                ),
-              ),
-            );
-          }
+          // Remove navigation from here
         },
         builder: (context, state) {
           return CustomHeaderWidget.expanded(
@@ -59,12 +44,27 @@ class TransferScreen extends StatelessWidget {
             bottomNavigationWidget: CustomButtonWidget(
               title: state.isSubmitting ? 'Enviando...' : 'Continuar',
               isLoading: state.isSubmitting,
-              onTap:
-                  state.isValid && !state.isSubmitting
-                      ? () {
-                        context.read<TransferBloc>().add(SubmitTransfer());
+              onTap: state.isValid && !state.isSubmitting
+                  ? () {
+                      context.read<TransferBloc>().add(SubmitTransfer());
+                      if (state.recipientName != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => TransferConfirmationPage(
+                              toAgency: state.agency,
+                              toAccount: state.account,
+                              amountInCents: int.tryParse(state.amount) ?? 0,
+                              currentBalanceInCents: homeState.balance,
+                              fromAgency: homeState.profile.agency.toString(),
+                              fromAccount: homeState.profile.account.toString(),
+                              recipientName: state.recipientName,
+                            ),
+                          ),
+                        );
                       }
-                      : null,
+                    }
+                  : null,
             ),
             body: SafeArea(
               minimum: const EdgeInsets.only(top: 32, left: 24, right: 24),
@@ -104,6 +104,11 @@ class TransferScreen extends StatelessWidget {
                       );
                       
                       context.read<TransferBloc>().add(AmountChanged(numericValue));
+                      
+                      final state = context.read<TransferBloc>().state;
+                      if (state.agency.isNotEmpty && state.account.isNotEmpty && amount > 0) {
+                        context.read<TransferBloc>().add(ValidateAgencyAccount(state.agency, state.account));
+                      }
                     },
                   ),
                   if (state.error != null) ...[
