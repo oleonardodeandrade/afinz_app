@@ -49,7 +49,7 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
       } catch (e) {
         emit(state.copyWith(
           isSubmitting: false,
-          error: e.toString(),
+          error: 'Conta não encontrada. Verifique os dados e tente novamente.',
           isValid: false,
         ));
       }
@@ -91,7 +91,7 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
       } catch (e) {
         emit(state.copyWith(
           isSubmitting: false,
-          error: e.toString(),
+          error: 'Não foi possível realizar a transferência. Tente novamente.',
           isValid: false,
         ));
       }
