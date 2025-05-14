@@ -1,7 +1,6 @@
-import 'package:afinz_app/features/profile/presentation/profile.dart';
+import 'package:afinz_app/features/transfer/presentation/pages/transfer_confirmation_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 import '../../../app/presentation/bloc/home_bloc.dart';
 import '../../../app/presentation/bloc/home_state.dart';
@@ -21,48 +20,37 @@ class TransferScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homeState = context.read<HomeBloc>().state;
-    final amountController = TextEditingController();
-
     if (homeState is! HomeLoaded) {
       return const Scaffold(body: Center(child: Text('Saldo não carregado')));
     }
-
     return BlocProvider(
       create: (_) => TransferBloc(
         repository: TransferRepositoryImpl(TransferRemoteDatasourceImpl()),
         currentBalance: homeState.balance,
       ),
-      child: BlocConsumer<TransferBloc, TransferState>(
-        listener: (context, state) {
-          // Remove navigation from here
-        },
+      child: BlocBuilder<TransferBloc, TransferState>(
         builder: (context, state) {
           return CustomHeaderWidget.expanded(
             appBarTitle: 'Transferir',
             isLeadingIcon: true,
             onTapLeadingIcon: () => Navigator.pop(context),
             bottomNavigationWidget: CustomButtonWidget(
-              title: state.isSubmitting ? 'Enviando...' : 'Continuar',
-              isLoading: state.isSubmitting,
-              onTap: state.isValid && !state.isSubmitting
+              title: 'Continuar',
+              onTap: (state.agency.isNotEmpty && state.account.isNotEmpty)
                   ? () {
-                      context.read<TransferBloc>().add(SubmitTransfer());
-                      if (state.recipientName != null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => TransferConfirmationPage(
-                              toAgency: state.agency,
-                              toAccount: state.account,
-                              amountInCents: int.tryParse(state.amount) ?? 0,
-                              currentBalanceInCents: homeState.balance,
-                              fromAgency: homeState.profile.agency.toString(),
-                              fromAccount: homeState.profile.account.toString(),
-                              recipientName: state.recipientName,
-                            ),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => TransferConfirmationPage(
+                            toAgency: state.agency,
+                            toAccount: state.account,
+                            currentBalanceInCents: homeState.balance,
+                            fromAgency: homeState.profile.agency.toString(),
+                            fromAccount: homeState.profile.account.toString(),
+                            recipientName: state.recipientName ?? '',
                           ),
-                        );
-                      }
+                        ),
+                      );
                     }
                   : null,
             ),
@@ -75,7 +63,7 @@ class TransferScreen extends StatelessWidget {
                     onChanged: (v) {
                       context.read<TransferBloc>().add(AgencyChanged(v));
                       final state = context.read<TransferBloc>().state;
-                      if (v.isNotEmpty && state.account.isNotEmpty && state.amount.isNotEmpty) {
+                      if (v.isNotEmpty && state.account.isNotEmpty) {
                         context.read<TransferBloc>().add(ValidateAgencyAccount(v, state.account));
                       }
                     },
@@ -86,36 +74,8 @@ class TransferScreen extends StatelessWidget {
                     onChanged: (v) {
                       context.read<TransferBloc>().add(AccountChanged(v));
                       final state = context.read<TransferBloc>().state;
-                      if (v.isNotEmpty && state.agency.isNotEmpty && state.amount.isNotEmpty) {
+                      if (v.isNotEmpty && state.agency.isNotEmpty) {
                         context.read<TransferBloc>().add(ValidateAgencyAccount(state.agency, v));
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  InputWidget(
-                    controller: amountController,
-                    hintText: 'Valor',
-                    keyboardType: TextInputType.number,
-                    onChanged: (v) {
-                      if (v.isEmpty) {
-                        context.read<TransferBloc>().add(AmountChanged(''));
-                        return;
-                      }
-                      final numericValue = v.replaceAll(RegExp(r'[^0-9]'), '');
-                      final amount = int.tryParse(numericValue) ?? 0;
-                      final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$', decimalDigits: 2);
-                      final formattedValue = formatter.format(amount / 100);
-                      
-                      amountController.value = TextEditingValue(
-                        text: formattedValue,
-                        selection: TextSelection.collapsed(offset: formattedValue.length),
-                      );
-                      
-                      context.read<TransferBloc>().add(AmountChanged(numericValue));
-                      
-                      final state = context.read<TransferBloc>().state;
-                      if (state.agency.isNotEmpty && state.account.isNotEmpty && amount > 0) {
-                        context.read<TransferBloc>().add(ValidateAgencyAccount(state.agency, state.account));
                       }
                     },
                   ),
