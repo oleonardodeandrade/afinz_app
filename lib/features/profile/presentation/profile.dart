@@ -1,6 +1,9 @@
 import 'package:afinz_app/features/transfer/presentation/pages/receipt_page.dart';
 import 'package:afinz_app/shared/widgets/text/text_and_subtitle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'bloc/profile_bloc.dart' as profile;
 
 import '../../../../shared/widgets/buttons/custom_button_widget.dart';
 import '../../../../shared/widgets/data/custom_eye_value.dart';
@@ -28,66 +31,110 @@ class TransferConfirmationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formattedValue = (amountInCents / 100).toStringAsFixed(2);
-    final parts = formattedValue.split('.');
-    final main = parts[0];
+    return BlocProvider(
+      create: (context) => profile.ProfileBloc(),
+      child: _TransferConfirmationPageContent(
+        toAgency: toAgency,
+        toAccount: toAccount,
+        amountInCents: amountInCents,
+        currentBalanceInCents: currentBalanceInCents,
+        fromAgency: fromAgency,
+        fromAccount: fromAccount,
+        recipientName: recipientName,
+      ),
+    );
+  }
+}
+
+class _TransferConfirmationPageContent extends StatelessWidget {
+  final String toAgency;
+  final String toAccount;
+  final int amountInCents;
+  final int currentBalanceInCents;
+  final String fromAgency;
+  final String fromAccount;
+  final String? recipientName;
+
+  const _TransferConfirmationPageContent({
+    super.key,
+    required this.toAgency,
+    required this.toAccount,
+    required this.amountInCents,
+    required this.currentBalanceInCents,
+    required this.fromAgency,
+    required this.fromAccount,
+    this.recipientName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '', decimalDigits: 2);
+    final formattedValue = formatter.format(amountInCents / 100);
+    final parts = formattedValue.split(',');
+    final main = parts[0].replaceAll('R\$ ', '');
     final cents = parts[1];
 
     final newBalance = currentBalanceInCents - amountInCents;
 
-    return CustomHeaderWidget.expanded(
-      appBarTitle: 'Transferir ',
-      isLeadingIcon: true,
-      onTapLeadingIcon: () => Navigator.pop(context),
-      bottomNavigationWidget: CustomButtonWidget(
-        title: 'Transferir',
-        color: Colors.green,
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => ReceiptPage(
-                finalBalanceInCents: newBalance,
-                status: 'Aprovado',
-                dateTime: DateTime.now(),
-                toAgency: toAgency,
-                toAccount: toAccount,
-                amountInCents: amountInCents,
-                fromAgency: fromAgency,
-                fromAccount: fromAccount,
-              ),
+    return BlocBuilder<profile.ProfileBloc, profile.ProfileState>(
+      builder: (context, state) {
+        return CustomHeaderWidget.expanded(
+          appBarTitle: 'Transferir ',
+          isLeadingIcon: true,
+          onTapLeadingIcon: () => Navigator.pop(context),
+          bottomNavigationWidget: CustomButtonWidget(
+            title: 'Transferir',
+            color: Colors.green,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ReceiptPage(
+                    finalBalanceInCents: newBalance,
+                    status: 'Aprovado',
+                    dateTime: DateTime.now(),
+                    toAgency: toAgency,
+                    toAccount: toAccount,
+                    amountInCents: amountInCents,
+                    fromAgency: fromAgency,
+                    fromAccount: fromAccount,
+                  ),
+                ),
+              );
+            },
+          ),
+          body: SafeArea(
+            minimum: const EdgeInsets.only(top: 32, left: 24, right: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomEyeValue(
+                  title: 'Valor a ser transferido',
+                  value: main,
+                  cents: cents,
+                  onTap: () {
+                    context.read<profile.ProfileBloc>().add(profile.ToggleValueVisibility());
+                  },
+                  isNotEye: false,
+                  hideEye: !state.isValueVisible,
+                ),
+                const SizedBox(height: 32),
+                CustomTitleWithSubtitleWidget(
+                  title: 'Transferir para',
+                  subtitle: recipientName ?? '',
+                ),
+                CustomTitleWithSubtitleWidget(
+                  title: 'Agência',
+                  subtitle: toAgency,
+                ),
+                CustomTitleWithSubtitleWidget(
+                  title: 'Conta',
+                  subtitle: toAccount,
+                ),
+              ],
             ),
-          );
-        },
-      ),
-      body: SafeArea(
-        minimum: const EdgeInsets.only(top: 32, left: 24, right: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomEyeValue(
-              title: 'Valor a ser transferido',
-              value: main,
-              cents: cents,
-              onTap: () {},
-              isNotEye: false,
-              hideEye: false,
-            ),
-            const SizedBox(height: 32),
-            CustomTitleWithSubtitleWidget(
-              title: 'Transferir para',
-              subtitle: recipientName ?? '',
-            ),
-            CustomTitleWithSubtitleWidget(
-              title: 'Agência',
-              subtitle: toAgency,
-            ),
-            CustomTitleWithSubtitleWidget(
-              title: 'Conta',
-              subtitle: toAccount,
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
