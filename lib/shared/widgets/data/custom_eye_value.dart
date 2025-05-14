@@ -64,7 +64,7 @@ class CustomEyeValue extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 64,
                           fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.bold,
                           color: Color(0xFF00C5CB),
                         ),
                       ),

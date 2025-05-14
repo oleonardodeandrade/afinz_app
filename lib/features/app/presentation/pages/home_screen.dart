@@ -11,6 +11,8 @@ import '../bloc/home_bloc.dart';
 import '../bloc/home_state.dart';
 import '../bloc/home_event.dart';
 
+import 'package:intl/intl.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -28,9 +30,10 @@ class HomeScreen extends StatelessWidget {
 
         if (state is HomeLoaded) {
           final name = state.profile.name;
-          final balance = (state.balance / 100).toStringAsFixed(2);
-          final parts = balance.split('.');
-          final main = parts[0];
+          final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '');
+          final formattedBalance = formatter.format(state.balance / 100);
+          final parts = formattedBalance.split(',');
+          final main = parts[0].replaceAll('R\$ ', '');
           final cents = parts[1];
 
           return CustomHeaderWidget(
