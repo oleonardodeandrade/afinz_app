@@ -54,7 +54,6 @@ class _TransferConfirmationPageContent extends StatelessWidget {
   final _amountController = TextEditingController();
 
   _TransferConfirmationPageContent({
-    super.key,
     required this.toAgency,
     required this.toAccount,
     required this.currentBalanceInCents,
