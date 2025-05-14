@@ -1,95 +1,130 @@
-# Afinz Technical Challenge (Flutter)
+# Afinz App
 
-This project is a solution to the Afinz technical challenge. It is developed in **Flutter** following **Clean Architecture**, with **BLoC** for state management and **GetIt** for dependency injection.
+Aplicativo de transferências bancárias desenvolvido como parte do desafio técnico da Afinz.
 
----
+## Arquitetura
 
-## Technologies Used
+Este projeto foi desenvolvido utilizando **Clean Architecture** com o padrão **BLoC** para gerenciamento de estado. A estrutura do projeto está organizada da seguinte forma:
 
-* Flutter
-* Clean Architecture (Domain → Data → Presentation)
-* BLoC for state management
-* Dio for HTTP requests
-* GetIt for dependency injection
-* flutter\_dotenv for environment variable handling
-* Mockito for unit testing
+### Camadas da Arquitetura
 
----
+- **Presentation**: Contém as interfaces de usuário (widgets, pages) e os BLoCs responsáveis por gerenciar o estado da aplicação.
+- **Domain**: Define as entidades de negócio, casos de uso e interfaces de repositórios.
+- **Data**: Implementa os repositórios e fontes de dados (APIs, banco de dados local).
 
-## Project Structure
+### Estrutura de Pastas
 
 ```
 lib/
-├── core/               # Dependency injection, configs
+├── core/
+│   ├── config/          # Configurações globais (API, HTTP)
+│   ├── error/           # Tratamento centralizado de erros
+│   └── injection.dart   # Configuração de injeção de dependências
 ├── features/
-│   ├── profile/        # Profile API (data/domain/presentation)
-│   ├── balance/        # Balance API (data/domain/presentation)
-│   ├── transfer/       # Transfer logic and UI
-│   └── app/            # Composed screens
-├── shared/             # Reusable UI and styles
-└── main.dart
+│   ├── app/             # Feature principal do app
+│   ├── profile/         # Feature de perfil do usuário
+│   └── transfer/        # Feature de transferência
+└── shared/              # Componentes compartilhados
+    └── widgets/         # Widgets reutilizáveis
 ```
 
----
+### Motivações para a Escolha da Arquitetura
 
-## Getting Started
+1. **Clean Architecture**:
+   - Separação clara de responsabilidades
+   - Facilidade para testes unitários
+   - Baixo acoplamento entre camadas
+   - Escalabilidade e manutenibilidade
 
-1. **Clone the repository**
+2. **BLoC (Business Logic Component)**:
+   - Separação entre UI e lógica de negócio
+   - Gerenciamento de estado previsível e testável
+   - Facilidade para lidar com operações assíncronas
+   - Integração nativa com o Flutter
+
+3. **Injeção de Dependências (GetIt)**:
+   - Desacoplamento de componentes
+   - Facilidade para mockar dependências em testes
+   - Gerenciamento eficiente do ciclo de vida das instâncias
+
+## Recursos e Funcionalidades
+
+- Visualização de saldo e informações da conta
+- Transferência de valores para outras contas
+- Validação de dados em tempo real
+- Tratamento de erros e feedback ao usuário
+- Testes unitários para garantir a qualidade do código
+
+## Tecnologias Utilizadas
+
+- **Flutter**: Framework para desenvolvimento multiplataforma
+- **Bloc/Flutter_Bloc**: Gerenciamento de estado
+- **Dio**: Cliente HTTP para comunicação com APIs
+- **GetIt**: Injeção de dependências
+- **Intl**: Formatação de valores monetários
+- **Mockito**: Framework para testes unitários
+- **Flutter DotEnv**: Gerenciamento de variáveis de ambiente
+
+## Requisitos
+
+- Flutter SDK: 3.19.0 ou superior
+- Dart: 3.3.0 ou superior
+
+## Como Executar o Projeto
+
+### 1. Configuração do Ambiente
+
+Certifique-se de ter o Flutter instalado e configurado corretamente:
+
+```bash
+flutter doctor
+```
+
+### 2. Clone o Repositório
 
 ```bash
 git clone https://github.com/oleonardodeandrade/afinz_app.git
 cd afinz_app
 ```
 
-2. **Install dependencies**
+### 3. Instale as Dependências
 
 ```bash
 flutter pub get
 ```
 
-3. **Create a **\`\`** file** in the root:
+### 4. Configure as Variáveis de Ambiente
+
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
 
 ```
 API_TOKEN=TOKEN-TEST-AFINZ
 BASE_URL=https://interview.mattlabz.tech
 ```
 
-4. **Run the app**
+### 5. Execute o Aplicativo
 
 ```bash
 flutter run
 ```
 
-> You can also pass env variables via `dart-define`:
+## Testes
 
-```bash
-flutter run --dart-define=API_TOKEN=TOKEN-TEST-AFINZ --dart-define=BASE_URL=https://interview.mattlabz.tech
-```
-
----
-
-## Implemented Requirements
-
-*
-
----
-
-## Running Tests
+Para executar os testes unitários:
 
 ```bash
 flutter test
 ```
 
-To regenerate mocks:
+## Observações
 
-```bash
-flutter pub run build_runner build --delete-conflicting-outputs
-```
+- O token de autenticação para a API é `TOKEN-TEST-AFINZ`
+- As transferências devem ser feitas para a agência 3212 e conta 9073
 
----
+## Possíveis Melhorias Futuras
 
-## Notes
-
-* All transfers go to agency `3212`, account `9073` as required.
-* Login is skipped — authentication is handled via static token.
-* If the API fails, error messages are displayed gracefully.
+- Implementação de persistência local com SharedPreferences ou Hive
+- Cache de dados para melhor performance offline
+- Implementação de testes de integração e widgets
+- Suporte para múltiplos idiomas
+- Implementação de temas claro/escuro
