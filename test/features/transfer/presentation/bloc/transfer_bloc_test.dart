@@ -72,7 +72,7 @@ void main() {
         isA<TransferState>(),
         isA<TransferState>(),
         isA<TransferState>().having((s) => s.isSubmitting, 'isSubmitting', true),
-        isA<TransferState>().having((s) => s.isSuccess, 'isSuccess', true),
+        isA<TransferState>().having((s) => s.isValid, 'isValid', true),
       ],
     );
 

@@ -9,6 +9,7 @@ import 'package:afinz_app/features/transfer/data/datasources/transfer_remote_dat
     as _i3;
 import 'package:dio/dio.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:mockito/src/dummies.dart' as _i5;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -80,6 +81,28 @@ class MockTransferRemoteDatasource extends _i1.Mock
             returnValueForMissingStub: _i4.Future<void>.value(),
           )
           as _i4.Future<void>);
+
+  @override
+  _i4.Future<String> validateAgencyAccount({
+    required int? agency,
+    required int? account,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#validateAgencyAccount, [], {
+              #agency: agency,
+              #account: account,
+            }),
+            returnValue: _i4.Future<String>.value(
+              _i5.dummyValue<String>(
+                this,
+                Invocation.method(#validateAgencyAccount, [], {
+                  #agency: agency,
+                  #account: account,
+                }),
+              ),
+            ),
+          )
+          as _i4.Future<String>);
 }
 
 /// A class which mocks [Dio].

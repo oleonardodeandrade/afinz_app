@@ -8,6 +8,7 @@ import 'dart:async' as _i3;
 import 'package:afinz_app/features/transfer/domain/repositories/transfer_repository.dart'
     as _i2;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:mockito/src/dummies.dart' as _i4;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -48,4 +49,26 @@ class MockTransferRepository extends _i1.Mock
             returnValueForMissingStub: _i3.Future<void>.value(),
           )
           as _i3.Future<void>);
+
+  @override
+  _i3.Future<String> validateAgencyAccount({
+    required int? agency,
+    required int? account,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#validateAgencyAccount, [], {
+              #agency: agency,
+              #account: account,
+            }),
+            returnValue: _i3.Future<String>.value(
+              _i4.dummyValue<String>(
+                this,
+                Invocation.method(#validateAgencyAccount, [], {
+                  #agency: agency,
+                  #account: account,
+                }),
+              ),
+            ),
+          )
+          as _i3.Future<String>);
 }
