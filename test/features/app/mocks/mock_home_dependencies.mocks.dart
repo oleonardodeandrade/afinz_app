@@ -5,7 +5,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
 
-import 'package:afinz_app/features/balance/domain/repositories/balance_repository.dart'
+import 'package:afinz_app/features/app/presentation/pages/balance/domain/repositories/balance_repository.dart'
     as _i5;
 import 'package:afinz_app/features/profile/domain/entities/profile.dart' as _i2;
 import 'package:afinz_app/features/profile/domain/repositories/profile_repository.dart'
