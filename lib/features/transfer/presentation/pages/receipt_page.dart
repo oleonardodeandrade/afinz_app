@@ -2,6 +2,7 @@ import 'package:afinz_app/shared/widgets/dividers/divider_widget.dart';
 import 'package:afinz_app/shared/widgets/text/text_and_subtitle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../shared/widgets/buttons/custom_button_widget.dart';
 import '../../../../shared/widgets/data/custom_eye_value.dart';
@@ -34,8 +35,13 @@ class ReceiptPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final balanceFormatted = (finalBalanceInCents / 100).toStringAsFixed(2).split('.');
-    final amountFormatted = (amountInCents / 100).toStringAsFixed(2);
+    final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '', decimalDigits: 2);
+    final formattedBalance = formatter.format(finalBalanceInCents / 100);
+    final parts = formattedBalance.split(',');
+    final main = parts[0].replaceAll('R\$ ', '');
+    final cents = parts[1];
+
+    final amountFormatted = formatter.format(amountInCents / 100);
     final dateStr = "${dateTime.day}/${dateTime.month}/${dateTime.year}";
     final timeStr = "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
 
@@ -62,8 +68,8 @@ class ReceiptPage extends StatelessWidget {
             children: [
               CustomEyeValue(
                 title: 'Novo Saldo',
-                value: balanceFormatted[0],
-                cents: balanceFormatted[1],
+                value: main,
+                cents: cents,
                 onTap: () {},
                 isNotEye: false,
                 hideEye: false,
@@ -92,7 +98,7 @@ class ReceiptPage extends StatelessWidget {
               const SizedBox(height: 28),
               CustomTitleWithSubtitleWidget(
                 title: 'Valor',
-                subtitle: 'R\$ $amountFormatted',
+                subtitle: amountFormatted,
               ),
               CustomTitleWithSubtitleWidget(
                 title: 'Sua conta',
