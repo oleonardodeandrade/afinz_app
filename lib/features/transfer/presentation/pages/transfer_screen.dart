@@ -72,16 +72,24 @@ class TransferScreen extends StatelessWidget {
                 children: [
                   InputWidget(
                     hintText: 'Agência',
-                    onChanged:
-                        (v) =>
-                            context.read<TransferBloc>().add(AgencyChanged(v)),
+                    onChanged: (v) {
+                      context.read<TransferBloc>().add(AgencyChanged(v));
+                      final state = context.read<TransferBloc>().state;
+                      if (v.isNotEmpty && state.account.isNotEmpty && state.amount.isNotEmpty) {
+                        context.read<TransferBloc>().add(ValidateAgencyAccount(v, state.account));
+                      }
+                    },
                   ),
                   const SizedBox(height: 12),
                   InputWidget(
                     hintText: 'Conta',
-                    onChanged:
-                        (v) =>
-                            context.read<TransferBloc>().add(AccountChanged(v)),
+                    onChanged: (v) {
+                      context.read<TransferBloc>().add(AccountChanged(v));
+                      final state = context.read<TransferBloc>().state;
+                      if (v.isNotEmpty && state.agency.isNotEmpty && state.amount.isNotEmpty) {
+                        context.read<TransferBloc>().add(ValidateAgencyAccount(state.agency, v));
+                      }
+                    },
                   ),
                   const SizedBox(height: 12),
                   InputWidget(
