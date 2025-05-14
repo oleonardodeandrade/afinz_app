@@ -1,17 +1,18 @@
-import 'package:afinz_app/shared/widgets/buttons/custom_button_widget.dart';
-import 'package:afinz_app/shared/widgets/data/custom_eye_value.dart';
-import 'package:afinz_app/shared/widgets/layout/custom_header_widget.dart';
+import 'package:afinz_app/features/transfer/presentation/pages/receipt_page.dart';
 import 'package:afinz_app/shared/widgets/text/text_and_subtitle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../bloc/transfer_confirmation_bloc.dart' as transfer;
-import 'receipt_page.dart';
+import '../bloc/transfer_confirmation_bloc.dart' as confirmation;
+
+import '../../../../shared/widgets/buttons/custom_button_widget.dart';
+import '../../../../shared/widgets/data/custom_eye_value.dart';
+import '../../../../shared/widgets/layout/custom_header_widget.dart';
+import '../../../../shared/widgets/inputs/input_widget.dart';
 
 class TransferConfirmationPage extends StatelessWidget {
   final String toAgency;
   final String toAccount;
-  final int amountInCents;
   final int currentBalanceInCents;
   final String fromAgency;
   final String fromAccount;
@@ -21,7 +22,6 @@ class TransferConfirmationPage extends StatelessWidget {
     super.key,
     required this.toAgency,
     required this.toAccount,
-    required this.amountInCents,
     required this.currentBalanceInCents,
     required this.fromAgency,
     required this.fromAccount,
@@ -31,11 +31,10 @@ class TransferConfirmationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => transfer.TransferConfirmationBloc(),
+      create: (context) => confirmation.TransferConfirmationBloc(),
       child: _TransferConfirmationPageContent(
         toAgency: toAgency,
         toAccount: toAccount,
-        amountInCents: amountInCents,
         currentBalanceInCents: currentBalanceInCents,
         fromAgency: fromAgency,
         fromAccount: fromAccount,
@@ -48,17 +47,16 @@ class TransferConfirmationPage extends StatelessWidget {
 class _TransferConfirmationPageContent extends StatelessWidget {
   final String toAgency;
   final String toAccount;
-  final int amountInCents;
   final int currentBalanceInCents;
   final String fromAgency;
   final String fromAccount;
   final String? recipientName;
+  final _amountController = TextEditingController();
 
-  const _TransferConfirmationPageContent({
+  _TransferConfirmationPageContent({
     super.key,
     required this.toAgency,
     required this.toAccount,
-    required this.amountInCents,
     required this.currentBalanceInCents,
     required this.fromAgency,
     required this.fromAccount,
@@ -67,38 +65,39 @@ class _TransferConfirmationPageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '', decimalDigits: 2);
-    final formattedValue = formatter.format(amountInCents / 100);
-    final parts = formattedValue.split(',');
-    final main = parts[0].replaceAll('R\$ ', '');
-    final cents = parts[1];
-
-    final newBalance = currentBalanceInCents - amountInCents;
-
-    return BlocBuilder<transfer.TransferConfirmationBloc, transfer.TransferConfirmationState>(
+    return BlocBuilder<confirmation.TransferConfirmationBloc, confirmation.TransferConfirmationState>(
       builder: (context, state) {
+        final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: '', decimalDigits: 2);
+        final formattedBalance = formatter.format(currentBalanceInCents / 100);
+        final parts = formattedBalance.split(',');
+        final main = parts[0].replaceAll('R\$ ', '');
+        final cents = parts[1];
+
         return CustomHeaderWidget.expanded(
-          appBarTitle: 'Transferir ',
+          appBarTitle: 'Transferir',
           isLeadingIcon: true,
           onTapLeadingIcon: () => Navigator.pop(context),
           bottomNavigationWidget: CustomButtonWidget(
             title: 'Transferir',
             color: Colors.green,
             onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => ReceiptPage(
-                    finalBalanceInCents: newBalance,
-                    status: 'Aprovado',
-                    dateTime: DateTime.now(),
-                    toAgency: toAgency,
-                    toAccount: toAccount,
-                    amountInCents: amountInCents,
-                    fromAgency: fromAgency,
-                    fromAccount: fromAccount,
+              final amount = int.tryParse(state.amount) ?? 0;
+              if (amount > 0) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ReceiptPage(
+                      finalBalanceInCents: currentBalanceInCents - amount,
+                      status: 'Aprovado',
+                      dateTime: DateTime.now(),
+                      toAgency: toAgency,
+                      toAccount: toAccount,
+                      amountInCents: amount,
+                      fromAgency: fromAgency,
+                      fromAccount: fromAccount,
+                    ),
                   ),
-                ),
-              );
+                );
+              }
             },
           ),
           body: SafeArea(
@@ -107,14 +106,37 @@ class _TransferConfirmationPageContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CustomEyeValue(
-                  title: 'Valor a ser transferido',
+                  title: 'Saldo em conta',
                   value: main,
                   cents: cents,
                   onTap: () {
-                    context.read<transfer.TransferConfirmationBloc>().add(transfer.ToggleValueVisibility());
+                    context.read<confirmation.TransferConfirmationBloc>().add(confirmation.ToggleValueVisibility());
                   },
                   isNotEye: false,
                   hideEye: !state.isValueVisible,
+                ),
+                const SizedBox(height: 32),
+                InputWidget(
+                  controller: _amountController,
+                  hintText: 'Valor a ser transferido',
+                  keyboardType: TextInputType.number,
+                  onChanged: (v) {
+                    if (v.isEmpty) {
+                      context.read<confirmation.TransferConfirmationBloc>().add(confirmation.AmountChanged(''));
+                      return;
+                    }
+                    final numericValue = v.replaceAll(RegExp(r'[^0-9]'), '');
+                    final amount = int.tryParse(numericValue) ?? 0;
+                    final formatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$', decimalDigits: 2);
+                    final formattedValue = formatter.format(amount / 100);
+                    
+                    _amountController.value = TextEditingValue(
+                      text: formattedValue,
+                      selection: TextSelection.collapsed(offset: formattedValue.length),
+                    );
+                    
+                    context.read<confirmation.TransferConfirmationBloc>().add(confirmation.AmountChanged(numericValue));
+                  },
                 ),
                 const SizedBox(height: 32),
                 CustomTitleWithSubtitleWidget(
@@ -136,4 +158,4 @@ class _TransferConfirmationPageContent extends StatelessWidget {
       },
     );
   }
-} 
+}
