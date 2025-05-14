@@ -5,7 +5,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i3;
 
-import 'package:afinz_app/features/balance/data/datasources/balance_remote_datasource.dart'
+import 'package:afinz_app/features/app/presentation/pages/balance/data/datasources/balance_remote_datasource.dart'
     as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 

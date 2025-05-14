@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import 'package:afinz_app/features/balance/data/repositories/balance_repository_impl.dart';
+import 'package:afinz_app/features/app/presentation/pages/balance/data/repositories/balance_repository_impl.dart';
 
 import '../../mocks/mock_balance_remote_datasource.mocks.dart';
 

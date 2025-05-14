@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import 'package:afinz_app/features/balance/data/datasources/balance_remote_datasource.dart';
+import 'package:afinz_app/features/app/presentation/pages/balance/data/datasources/balance_remote_datasource.dart';
 
 import '../../../transfer/mocks/mock_transfer_remote_datasource.mocks.dart';
 
